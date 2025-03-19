@@ -1,0 +1,116 @@
+#!/bin/bash
+
+CONFIG_FILE=".depsentry"
+STATE_FILE=".depsentry-state"
+
+# Check for required commands
+check_dependencies() {
+    if ! command -v jq &> /dev/null; then
+        echo "Error: jq is required but not installed"
+        exit 1
+    fi
+}
+
+generate_checksum() {
+    if [ -f "$1" ]; then
+        sha256sum "$1" | cut -d' ' -f1
+    else
+        echo "Error: File $1 not found"
+        exit 1
+    fi
+}
+
+init() {
+    if [ -f "$CONFIG_FILE" ]; then
+        echo "Configuration file already exists"
+        exit 1
+    fi
+
+    # Create a simple example config file
+    cat > "$CONFIG_FILE" << EOF
+# List files to watch, one per line
+# Lines starting with # are ignored
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+EOF
+    echo "Created $CONFIG_FILE"
+}
+
+update_state() {
+    if [ ! -f "$CONFIG_FILE" ]; then
+        echo "No configuration file found. Run 'depsentry init' first"
+        exit 1
+    fi
+
+    echo "{\"checksums\": {}}" > "$STATE_FILE"
+    
+    # Read non-empty, non-comment lines from config
+    grep -v '^#' "$CONFIG_FILE" | grep -v '^$' | while read -r file; do
+        if [ -f "$file" ]; then
+            checksum=$(generate_checksum "$file")
+            tmp=$(mktemp)
+            jq --arg file "$file" --arg sum "$checksum" \
+               '.checksums[$file] = {"hash": $sum, "lastUpdated": "'"$(date -u +"%Y-%m-%dT%H:%M:%SZ")"'"}' \
+               "$STATE_FILE" > "$tmp" && mv "$tmp" "$STATE_FILE"
+        fi
+    done
+    
+    echo "Updated state file"
+}
+
+check_files() {
+    if [ ! -f "$CONFIG_FILE" ]; then
+        echo "No configuration file found. Run 'depsentry init' first"
+        exit 1
+    fi
+
+    [ ! -f "$STATE_FILE" ] && update_state
+
+    exit_code=0
+    
+    # Read non-empty, non-comment lines from config
+    grep -v '^#' "$CONFIG_FILE" | grep -v '^$' | while read -r file; do
+        if [ -f "$file" ]; then
+            current_sum=$(generate_checksum "$file")
+            stored_sum=$(cat "$STATE_FILE" | jq -r ".checksums.\"$file\".hash")
+            
+            if [ "$current_sum" != "$stored_sum" ]; then
+                echo "⚠️  File $file has changed!"
+                exit 1
+            fi
+        fi
+    done || exit_code=1
+    
+    exit $exit_code
+}
+
+show_status() {
+    if [ ! -f "$STATE_FILE" ]; then
+        echo "No state file found. Run 'depsentry check' first"
+        exit 1
+    fi
+    
+    jq '.' "$STATE_FILE"
+}
+
+# Main command handling
+case "$1" in
+    "init")
+        init
+        ;;
+    "update")
+        update_state
+        ;;
+    "status")
+        show_status
+        ;;
+    "check"|"")  # Empty means no command provided
+        check_files
+        ;;
+    *)
+        echo "Usage: depsentry [init|check|update|status]"
+        echo "If no command is provided, check is performed"
+        exit 1
+        ;;
+esac 

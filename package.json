@@ -1,0 +1,30 @@
+{
+  "name": "depsentry",
+  "version": "1.0.0",
+  "description": "A minimalistic tool to track dependency changes as a plugin part of your daily workflow",
+  "bin": {
+    "depsentry": "./bin/depsentry"
+  },
+  "files": [
+    "bin/"
+  ],
+  "scripts": {
+    "test": "./test/test.sh"
+  },
+  "keywords": [
+    "dependencies",
+    "security",
+    "checksum",
+    "verification"
+  ],
+  "author": "Dag Jomar Mersland",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dagjomar/depsentry.git"
+  },
+  "bugs": {
+    "url": "https://github.com/dagjomar/depsentry/issues"
+  },
+  "homepage": "https://github.com/dagjomar/depsentry#readme"
+} 

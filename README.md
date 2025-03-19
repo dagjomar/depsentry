@@ -1,6 +1,10 @@
 # depsentry
 
-A tool that helps you know when you should run `yarn/npm/pnpm install` when someone else have changed your package.json dependencies.
+## A tool that helps you know when you should run `yarn/npm/pnpm install` when someone else have changed your package.json dependencies.
+
+<img src="./docs/depsentry-illustration.jpeg" alt="Depsentry Illustration" width="480"/>
+
+<br />
 
 Generally speaking, it is a lightweight file monitoring tool that alerts you when specific files have changed their hash checksum. This makes it a microtool that can be used as part of your custom workflow/pipeline and help track changes in files that are shared between different collaborators, such as in a git repo.
 
@@ -44,7 +48,7 @@ Enter: `depsentry` - the tool that checks and notifies you when this happens.
 
 - Now, make depsentry run as part of your default dev/start command in your `package.json` file:
 
-  ```json
+  ```
   ...
   scripts: {
     start: "depsentry && next dev"

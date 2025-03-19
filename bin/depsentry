@@ -30,9 +30,11 @@ init() {
     cat > "$CONFIG_FILE" << EOF
 # List files to watch, one per line
 # Lines starting with # are ignored
-package-lock.json
-yarn.lock
-pnpm-lock.yaml
+# These are example files you may want to watch
+# package.json
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
 EOF
     echo "Created $CONFIG_FILE"
 }
@@ -76,7 +78,7 @@ check_files() {
             stored_sum=$(cat "$STATE_FILE" | jq -r ".checksums.\"$file\".hash")
             
             if [ "$current_sum" != "$stored_sum" ]; then
-                echo "⚠️  File $file has changed!"
+                echo "⚠️  File $file has changed since last check. You may want to do something as a consequence."
                 exit 1
             fi
         fi

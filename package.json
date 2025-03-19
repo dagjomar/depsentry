@@ -1,9 +1,9 @@
 {
   "name": "depsentry",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A minimalistic tool to track dependency changes as a plugin part of your daily workflow",
   "bin": {
-    "depsentry": "./bin/depsentry"
+    "depsentry": "bin/depsentry"
   },
   "files": [
     "bin/"
@@ -27,4 +27,4 @@
     "url": "https://github.com/dagjomar/depsentry/issues"
   },
   "homepage": "https://github.com/dagjomar/depsentry#readme"
-} 
+}

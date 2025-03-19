@@ -1,6 +1,6 @@
 {
   "name": "depsentry",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "A minimalistic tool to track dependency changes as a plugin part of your daily workflow",
   "bin": {
     "depsentry": "./bin/depsentry"
